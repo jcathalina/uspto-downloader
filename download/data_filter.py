@@ -4,6 +4,7 @@ from download_configuration import DownloadConfiguration
 from datetime import date
 from bs4 import BeautifulSoup
 import re
+import requests
 
 
 class DataFilter:
@@ -20,7 +21,7 @@ class DataFilter:
 
             # the patents we are looking for include text + images
             # this corresponds to the URLs with redbook/YEAR pattern.
-            if re.search(r"redbook/[0-9]", a_tag['href']):
+            if re.search(r"grant/redbook/[0-9]", a_tag['href']):
                 redbook_data.append(a_tag['href'])
 
         return redbook_data
@@ -43,6 +44,17 @@ class DataFilter:
                 filtered_links.append(link)
 
         return filtered_links
+
+    def get_all_download_urls(self, url_dirs: List[str]):
+        download_urls = []
+        for ud in url_dirs:
+            page = requests.get(ud)
+            if page.status_code == 200:
+                content = page.content
+                soup = BeautifulSoup(content, "html.parser")
+                download_urls.extend(self.get_tarfile_tags(soup))
+        return download_urls
+
 
     @staticmethod
     def get_tarfile_tags(soup: BeautifulSoup) -> List[str]:
