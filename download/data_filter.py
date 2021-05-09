@@ -7,6 +7,7 @@ import re
 import requests
 from urllib.parse import urljoin
 
+
 class DataFilter:
     def __init__(self, config: DownloadConfiguration):
         self.config = config
@@ -25,7 +26,6 @@ class DataFilter:
                 redbook_data.append(a_tag['href'])
 
         return redbook_data
-
 
     def filter_by_year(self, links: List[str]) -> List[str]:
         """
@@ -55,11 +55,10 @@ class DataFilter:
                 soup = BeautifulSoup(content, "html.parser")
                 tarfile_names = self.get_tarfile_tags(soup)
                 for name in tarfile_names:
-                    complete_urls.append(urljoin(ud, name))
+                    complete_urls.append(urljoin(f"{ud}/", name))  # necessary formatting to make sure url is built properly
                 download_urls.extend(complete_urls)
                 complete_urls = []
         return download_urls
-
 
     @staticmethod
     def get_tarfile_tags(soup: BeautifulSoup) -> List[str]:
