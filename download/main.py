@@ -6,10 +6,17 @@ from download.download_configuration import DownloadConfiguration, DateRange
 from download.downloader import Downloader
 from datetime import date
 import concurrent.futures
+from urllib.parse import urljoin
 
 import requests
 
 BASE_URL = "https://bulkdata.uspto.gov/"
+# REL_URL = urljoin(BASE_URL, "patent/grant/redbook/")
+# test = "I20210105.tar"
+# x = test[1:5]
+# # FINAL_URL = urljoin(REL_URL, )
+# print(x)
+# exit(0)
 
 page = requests.get(BASE_URL)
 html = page.content
@@ -26,7 +33,9 @@ df = DataFilter(conf)
 a = df.get_redbook_data(soup=soup)
 b = df.filter_by_year(a)
 c = df.get_all_download_urls(b)
+print(c)
 urls: List[str] = c
+# built_urls = [urljoin(BASE_URL, )]
 
 downloader = Downloader(config=conf, d_filter=df)
 print(f"Number of URLS: {len(urls)}")

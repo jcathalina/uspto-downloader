@@ -5,7 +5,7 @@ from datetime import date
 from bs4 import BeautifulSoup
 import re
 import requests
-
+from urllib.parse import urljoin
 
 class DataFilter:
     def __init__(self, config: DownloadConfiguration):
@@ -27,7 +27,6 @@ class DataFilter:
         return redbook_data
 
 
-
     def filter_by_year(self, links: List[str]) -> List[str]:
         """
         :param links:
@@ -47,12 +46,18 @@ class DataFilter:
 
     def get_all_download_urls(self, url_dirs: List[str]):
         download_urls = []
+        complete_urls = []
+
         for ud in url_dirs:
             page = requests.get(ud)
             if page.status_code == 200:
                 content = page.content
                 soup = BeautifulSoup(content, "html.parser")
-                download_urls.extend(self.get_tarfile_tags(soup))
+                tarfile_names = self.get_tarfile_tags(soup)
+                for name in tarfile_names:
+                    complete_urls.append(urljoin(ud, name))
+                download_urls.extend(complete_urls)
+                complete_urls = []
         return download_urls
 
 
